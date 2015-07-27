@@ -1,13 +1,22 @@
 #!/usr/bin/env python
-'''
-mm.py - Using the list of S&P 500 companies from http://data.okfn.org/data/core/s-and-p-500-companies,
-        marketmonitor polls the Yahoo Finance API once a minute for the latest pricing information.
-        Between 09:30AM and 16:00PM EST the program will run pulling this information. Before markets
-        open it will pull the last price on closing.
-'''
+""" mm.py - MarketMonitor polls the Yahoo Finance API for latest index data.
+
+	Using the list of S&P 500 companies from http://data.okfn.org/data/core/s-and-p-500-companies,
+    marketmonitor polls the Yahoo Finance API once a minute for the latest pricing information.
+    Between 09:30AM and 16:00PM EST the program will run pulling this information. Before markets
+    open it will pull the last price on closing.
+"""
 import sys
 from time import sleep
 from yahoo_finance import Share
+
+__author__ = "William Dowling"
+__copyright__ = "Copyright 2015 William Dowling (wmdowling@gmail.com)"
+                    "Matthew Wakefield"]
+__license__ = "MIT"
+__version__ = "0.1"
+__maintainer__ = "William Dowling"
+__email__ = "wmdowling@gmail.com"
 
 def monitor(symbols):
 	'''
