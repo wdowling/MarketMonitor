@@ -30,9 +30,12 @@ def monitor(symbols):
 	try:
 		while(True):
 			for symbol in symbols:
-				yh = Share(symbol)
-				print symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange())
-				sleep(5)
+				try:
+					yh = Share(symbol)
+					print symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange())
+					sleep(5)
+				except ConnectionError as e:
+					print 'No response from Yahoo Finance API. Trying again...'
 
 			yh.refresh
 	except KeyboardInterrupt:
