@@ -39,7 +39,8 @@ def monitor(symbols):
 					logging.debug(symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange()))
 					sleep(5)
 				except ConnectionError as e:
-					print 'No response from Yahoo Finance API. Trying again...'
+					logging.debug(e)
+					logging.debug('No response from Yahoo Finance API. Trying again...')
 
 			yh.refresh
 	except KeyboardInterrupt:
