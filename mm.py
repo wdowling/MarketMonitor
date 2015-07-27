@@ -6,17 +6,21 @@
     Between 09:30AM and 16:00PM EST the program will run pulling this information. Before markets
     open it will pull the last price on closing.
 """
+import logging
 import sys
 from time import sleep
 from yahoo_finance import Share
+from requests.exceptions import ConnectionError
 
 __author__ = "William Dowling"
 __copyright__ = "Copyright 2015 William Dowling (wmdowling@gmail.com)"
-                    "Matthew Wakefield"]
 __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "William Dowling"
 __email__ = "wmdowling@gmail.com"
+
+# Initialize logging
+logging.basicConfig(filename='/var/log/marketmonitor.log', level=logging.DEBUG)
 
 def monitor(symbols):
 	'''
@@ -26,13 +30,13 @@ def monitor(symbols):
 		get_prev_close()
 		get_change()
 	'''
-	print 'Symbol | Datetime | Close Price | Open | Current | Change | Volume | Exchange'
+	logging.debug('Symbol | Datetime | Close Price | Open | Current | Change | Volume | Exchange')
 	try:
 		while(True):
 			for symbol in symbols:
 				try:
 					yh = Share(symbol)
-					print symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange())
+					logging.debug(symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange()))
 					sleep(5)
 				except ConnectionError as e:
 					print 'No response from Yahoo Finance API. Trying again...'
