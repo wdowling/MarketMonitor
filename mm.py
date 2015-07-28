@@ -8,6 +8,7 @@
 """
 import logging
 import sys
+import multiprocessing as mp
 from time import sleep
 from yahoo_finance import Share
 from requests.exceptions import ConnectionError
@@ -22,7 +23,7 @@ __email__ = "wmdowling@gmail.com"
 # Initialize logging
 logging.basicConfig(filename='/var/log/marketmonitor.log', level=logging.DEBUG)
 
-def monitor(symbols):
+def monitor(symbol):
 	'''
 	Pull the following information from each symbol:
 		get_price()
@@ -33,19 +34,18 @@ def monitor(symbols):
 	logging.debug('Symbol | Datetime | Close Price | Open | Current | Change | Volume | Exchange')
 	try:
 		while(True):
-			for symbol in symbols:
-				try:
-					yh = Share(symbol)
-					logging.debug(symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange()))
-					sleep(5)
-				except ConnectionError as e:
-					logging.debug(e)
-					logging.debug('No response from Yahoo Finance API. Trying again...')
+			try:
+				yh = Share(symbol)
+				logging.debug(symbol + ' | ' + str(yh.get_trade_datetime()) + ' | ' + str(yh.get_prev_close()) + ' | ' + str(yh.get_open()) + ' | ' + str(yh.get_price()) + ' | ' + str(yh.get_change()) + ' | ' + str(yh.get_volume()) + ' | ' + str(yh.get_stock_exchange()))
+				sleep(5)
+			except ConnectionError as e:
+				logging.debug(e)
+				logging.debug('No response from Yahoo Finance API. Trying again...')
 
 			yh.refresh
-	except KeyboardInterrupt:
-		print 'Quitting Market Monitor....'
-		sys.exit()
+	except KeyboardInterrupt as e:
+		logging.debug(e)
+		return
 
 def loadSymbols():
 	'''
@@ -59,7 +59,17 @@ def loadSymbols():
 	finally:
 		f.close()
 
-	monitor(symbols)
+	# Kick off parallel processing of symbols. For now we stick to
+    # 10 jobs conccurrently. Also the signal catching needs to be revised
+	# as it does not exit gracefully.
+	try:
+		p = mp.Pool(processes=10)
+		p.map(monitor, symbols)
+	except KeyboardInterrupt as e:
+		print 'Quitting Market Monitor....'
+		logging.debug(e)
+		p.close()
+		sys.exit()
 
 if __name__ == '__main__':
 	print 'Initializing Market Monitor...'
